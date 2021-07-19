@@ -8,7 +8,12 @@ import("stdfaust.lib");
 
 merge2 = _,_: ba.parallelMean(2);
 
-silenceDetect(analysisWin, dBSilenceTh, timeSilenceTh, xInput) =
+silenceDetect(
+    analysisWin,
+    dBSilenceTh,
+    timeSilenceTh,
+    xInput
+) =
         ba.linear2db(
             an.rms_envelope_t19(
                 analysisWin, 
@@ -49,18 +54,24 @@ applySilenceFallback(xBackupL, xBackupR, xMainL, xMainR) =
         xBackupL, xBackupR
     );
 
-switcher(x1L, x1R, x2L, x2R, x3L, x3R, x4L, x4R) =
-    ba.select2stereo(checkbox("1on"),
-        ba.select2stereo(checkbox("2on"),
-            ba.select2stereo(checkbox("3on"), x4L, x4R, x3L, x3R),
-            x2L, x2R
-        ),
-        x1L, x1R
-    )
-    : _,_ : applySilenceFallback(x4L, x4R);
+switcherN(N, xBackupL, xBackupR) = 
+    par(n, N, _,_) : selector(N)
+    with {
+        selector(1) = ba.select2stereo(
+            checkbox("1"),
+            xBackupL,
+            xBackupR,
+            _,_
+        );
+        selector(n) = ba.select2stereo(
+            checkbox("%n"),
+            selector(n-1),
+            _,_
+        );
+    };
+    
+fallbackSwitcherN(N, xBackupL, xBackupR) =
+    switcherN(N, xBackupL, xBackupR) : _,_ : applySilenceFallback(xBackupL, xBackupR);
 
-fallbackSwitcher(x1L, x1R, x2L, x2R, x3L, x3R, x4L, x4R) =
-    switcher(x1L, x1R, x2L, x2R, x3L, x3R, x4L, x4R)
-    : applySilenceFallback(x4L, x4R);
-
-process = par(i, 4, _,_) : switcher : _,_;
+N = 3;
+process = par(n, N, _,_),_,_ : fallbackSwitcherN(N) : _,_;

@@ -1,7 +1,5 @@
-use crate::config::Port;
 use clap::Clap;
 use faust_state::DspHandle;
-use std::{thread, time::Duration};
 
 mod config;
 mod jack;

@@ -1,4 +1,4 @@
-use async_osc::{prelude::*, Error, OscPacket, OscSocket, OscType, Result};
+use async_osc::{prelude::*, OscPacket, OscSocket, OscType};
 use async_std::stream::StreamExt;
 use faust_state::StateHandle;
 

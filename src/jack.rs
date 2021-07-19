@@ -3,9 +3,8 @@ use faust_types::FaustDsp;
 use jack::AudioIn;
 use jack::*;
 use smallvec::SmallVec;
-use std::io;
+
 use std::thread;
-use std::time::Duration;
 
 use crate::config::Port as PortConfig;
 

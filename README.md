@@ -8,11 +8,12 @@ A input switcher and silence detector for JACK.
 
 ## Roadmap
 
-- [x] Core DSP engine via Faust for switching and silence detection
+- [x] Core DSP engine via Faust for switching, silence detection and level metering
 - [x] JACK client with autoconnect
-- [x] OSC interface
+- [x] OSC interface for switching
 - [ ] HTTP interface
 - [ ] Web frontend
+- [ ] Level meter on CLI and web frontend
 - [ ] Authentication 
 
 ## Installation

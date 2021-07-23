@@ -6,6 +6,15 @@ A input switcher and silence detector for JACK.
 * A fallback channel is activated if the active input is below a volume threshold for some amount of seconds
 * Channels may be switched via OSC and HTTP (TODO)
 
+## Roadmap
+
+- [x] Core DSP engine via Faust for switching and silence detection
+- [x] JACK client with autoconnect
+- [x] OSC interface
+- [ ] HTTP interface
+- [ ] Web frontend
+- [ ] Authentication 
+
 ## Installation
 
 ```

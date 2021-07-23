@@ -2,17 +2,17 @@ use std::path::Path;
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Config {
     pub inputs: Vec<Port>,
     pub fallback_input: Port,
     pub output: Option<Port>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Port {
-    pub name: Option<String>,
-    pub ports: [String; 2],
+    pub label: Option<String>,
+    pub ports: Option<[String; 2]>,
 }
 
 impl Config {
@@ -38,6 +38,6 @@ impl Config {
             //     return Ok(config);
             // }
         }
-        anyhow::bail!("Config file not found");
+        Ok(Config::default())
     }
 }

@@ -8,6 +8,15 @@ import("stdfaust.lib");
 
 merge2 = _,_: ba.parallelMean(2);
 
+// helpers to build a VU meter
+envelop = abs : max ~ -(1.0/ma.SR) : max(ba.db2linear(-70)) : ba.linear2db;
+vumeterM(x) = envelop(x) : vbargraph("level[2][unit:dB][style:dB]", -60, +5);
+vumeterS(a,b) = a,b <: _,_,_,_ : 
+  (a, b, attach(0,vumeterM((a+b)/2)), 0) :>
+  _,_;
+vumeter = _,_ : vumeterS(_,_);
+vumeterI(i) = _,_ : vgroup("level/%i", vumeter) : _,_;
+
 silenceDetect(
     analysisWin,
     dBSilenceTh,
@@ -55,7 +64,7 @@ applySilenceFallback(xBackupL, xBackupR, xMainL, xMainR) =
     );
 
 switcherN(N, xBackupL, xBackupR) = 
-    par(n, N, _,_) : selector(N)
+    par(n, N, _,_) : hgroup("active", selector(N))
     with {
         selector(1) = ba.select2stereo(
             checkbox("1"),
@@ -73,5 +82,7 @@ switcherN(N, xBackupL, xBackupR) =
 fallbackSwitcherN(N, xBackupL, xBackupR) =
     switcherN(N, xBackupL, xBackupR) : _,_ : applySilenceFallback(xBackupL, xBackupR);
 
+inputMeters(N) = hgroup("input", par(n, N, vgroup("%n", vumeter)));
+
 N = 3;
-process = par(n, N, _,_),_,_ : fallbackSwitcherN(N) : _,_;
+process = par(n, N + 1, _,_) : inputMeters(N + 1) : fallbackSwitcherN(N) : vumeter : _,_;

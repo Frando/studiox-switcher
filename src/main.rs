@@ -14,9 +14,13 @@ struct Opts {
     /// Path to config file
     #[clap(short, long)]
     pub config: Option<String>,
+    /// Strict mode (exit if initial connections fail)
+    #[clap(long)]
+    pub strict: bool,
 }
 
 fn main() -> anyhow::Result<()> {
+    env_logger::init();
     let opts = Opts::parse();
     let config = match opts.config {
         Some(config_path) => config::Config::load_from_path(config_path)?,
@@ -28,17 +32,10 @@ fn main() -> anyhow::Result<()> {
     in_ports.extend(config.inputs.clone());
     let port_spec = (in_ports, config.output.clone());
 
-    // let config = config::Config::load()?;
-    eprintln!("config {:#?}", config);
     let (dsp, state) = DspHandle::<faust::Switcher>::new();
-    eprintln!("client name: {}", dsp.name());
-    eprintln!("inputs: {}", dsp.num_inputs());
-    eprintln!("outputs: {}", dsp.num_outputs());
-    eprintln!("params: {:#?}", state.params());
-    // eprintln!("meta: {:#?}", state.meta());
-
-    // thread::spawn(move || {
-    // });
+    for (_, param) in state.params() {
+        log::debug!("param: {}", param.path());
+    }
 
     // Run the DSP as JACK client.
     let jack_handle = jack::start_dsp(dsp, Some(port_spec))?;
@@ -51,8 +48,4 @@ fn main() -> anyhow::Result<()> {
 
     server::run_server(state)?;
     Ok(())
-    // wait
-    // loop {
-    //     thread::sleep(Duration::from_secs(10))
-    // }
 }

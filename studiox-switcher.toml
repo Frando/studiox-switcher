@@ -1,14 +1,15 @@
+# the fallback input is the default input that will always be active
+# if no other input is active.
+[fallback_input]
+ports = ["stream1:out_0", "stream1:out_1"]
+
 [[inputs]]
-name = "player1"
+label = "player1"
 ports = ["player1:out_0", "player1:out_1"]
 
 [[inputs]]
-name = "player2"
+label = "player2"
 ports = ["player2:out_0", "player2:out_1"]
-
-[fallback_input]
-name = "stream1"
-ports = ["stream1:out_0", "stream1:out_1"]
 
 [output]
 ports = ["system:playback_1", "system:playback_2"]
